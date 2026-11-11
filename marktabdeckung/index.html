@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Marktabdeckung DE–PMI</title>
+<style>
+  :root{
+    --navy:#051C2C; --ink:#1A1A1A; --mute:#6B7280; --line:#D0D5DD;
+    --us:#051C2C; --comp:#C3CAD4; --white:#FFFFFF;
+    --w1:#2251FF; --w2:#00A9F4; --w3:#9ADCF7; --np:#EEF1F4;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:#fff;font-family:Arial,"Helvetica Neue",Helvetica,sans-serif;color:var(--ink)}
+  .slide{width:1600px;height:900px;padding:34px 44px 24px;position:relative;background:#fff}
+  .tracker{font-size:13px;letter-spacing:.08em;text-transform:uppercase;color:var(--w1);font-weight:700}
+  h1{font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:30px;line-height:1.2;margin:6px 0 4px;color:var(--navy);max-width:1450px}
+  .sub{font-size:15px;color:var(--mute);margin-bottom:16px}
+  .body{display:flex;gap:30px}
+  .matrixWrap{position:relative;padding-left:30px}
+  .yaxis{position:absolute;left:0;top:110px;bottom:0;width:22px;display:flex;align-items:center;justify-content:center}
+  .yaxis span{transform:rotate(-90deg);white-space:nowrap;font-size:13px;font-weight:700;color:var(--navy);letter-spacing:.04em}
+  .xaxis{margin-left:300px;font-size:13px;font-weight:700;color:var(--navy);letter-spacing:.04em;margin-bottom:4px}
+  .grid{display:grid;grid-template-columns:96px 196px repeat(11,72px);grid-template-rows:auto auto repeat(7,66px);column-gap:3px;row-gap:3px;margin-left:0}
+  .grp{font-size:11px;font-weight:700;color:var(--navy);border-bottom:2px solid var(--navy);padding:0 2px 3px;text-align:center;align-self:end}
+  .ch{font-size:11px;line-height:1.2;color:var(--ink);text-align:center;padding:4px 2px 4px;align-self:end;min-height:44px;display:flex;align-items:flex-end;justify-content:center}
+  .rg{grid-column:1;font-size:11px;font-weight:700;color:var(--navy);border-right:2px solid var(--navy);display:flex;align-items:center;padding:0 8px 0 0;line-height:1.25}
+  .rh{grid-column:2;font-size:12px;line-height:1.25;display:flex;align-items:center;padding:0 8px 0 8px}
+  .cell{border-radius:2px;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:17px;color:#fff;position:relative}
+  .U{background:var(--us)}
+  .W{background:var(--comp)}
+  .O{background:var(--white);border:1.5px dashed #98A2B3}
+  .X{background:repeating-linear-gradient(45deg,#fff 0 5px,#E4E7EC 5px 7px)}
+  .NP{background:var(--np);border:1.5px dashed #98A2B3}
+  .w1{background:var(--w1)} .w2{background:var(--w2)} .w3{background:var(--w3);color:var(--navy)}
+  .frame{position:absolute;border:3px solid var(--navy);pointer-events:none;border-radius:3px}
+  .frameLbl{position:absolute;background:#fff;color:var(--navy);font-size:12px;font-weight:700;padding:0 6px;letter-spacing:.03em;white-space:nowrap}
+  .side{width:330px;padding-top:6px}
+  .kpi{border-top:3px solid var(--navy);padding-top:10px;margin-bottom:16px}
+  .kpi .lbl{font-size:12px;color:var(--mute);text-transform:uppercase;letter-spacing:.06em}
+  .kpi .val{font-family:Georgia,serif;font-size:40px;color:var(--navy);line-height:1.05;margin-top:4px}
+  .kpi .val small{font-size:16px;color:var(--mute);font-family:Arial,sans-serif}
+  .legend{display:flex;flex-direction:column;gap:7px;font-size:12.5px;margin-bottom:16px}
+  .legend div{display:flex;align-items:center;gap:9px}
+  .sw{width:22px;height:16px;border-radius:2px;flex:none}
+  .init{font-size:12.5px;line-height:1.3}
+  .init .row{display:grid;grid-template-columns:26px 1fr 44px;gap:8px;align-items:start;padding:6px 0;border-bottom:1px solid var(--line)}
+  .badge{width:24px;height:24px;border-radius:2px;color:#fff;font-weight:700;display:flex;align-items:center;justify-content:center;font-size:13px}
+  .init b{color:var(--navy)}
+  .init .pp{font-weight:700;color:var(--w1);text-align:right}
+  .init .hd{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--mute);border-bottom:2px solid var(--navy);padding-bottom:4px}
+  .bars{margin-top:4px}
+  .foot{position:absolute;left:44px;right:44px;bottom:18px;font-size:11px;color:var(--mute);border-top:1px solid var(--line);padding-top:6px;display:flex;justify-content:space-between}
+  .hide{display:none!important}
+</style>
+</head>
+<body>
+<div class="slide" id="slide">
+  <div class="tracker" id="tracker"></div>
+  <h1 id="title"></h1>
+  <div class="sub" id="sub"></div>
+  <div class="body">
+    <div class="matrixWrap" id="mw">
+      <div class="xaxis">FLÜGE &nbsp;→&nbsp; alle Carrier × Fare-Familien × Pricing × Optionen</div>
+      <div class="grid" id="grid"></div>
+      <div class="yaxis"><span></span></div>
+    </div>
+    <div class="side" id="side"></div>
+  </div>
+  <div class="foot"><span>Illustrativ – Zellen = Produktkombinationen Flug × Hotel auf der Strecke DE → PMI; Gewichtung nach Buchungsvolumen in Folgeschritt zu validieren</span><span>TOM = heutiges Operating Model (Pauschal-/Kontingent-Setup)</span></div>
+</div>
+
+<script>
+// ---------- Datenmodell ----------
+const colGroups = [
+  {name:"Charter / Kontingent", span:1},
+  {name:"Linienflug (Network Carrier)", span:4},
+  {name:"Low-Cost Carrier", span:3},
+  {name:"Pricing & Optionen", span:2},
+  {name:"Ohne Flug", span:1},
+];
+const cols = [
+  "IT-/Paket-Fare inkl. Gepäck",
+  "Light – nur Handgepäck",
+  "Classic – inkl. Koffer",
+  "Flex – umbuchbar",
+  "Voll erstattbar",
+  "Basic – nur Personal Item",
+  "Bundle – Koffer + Sitz",
+  "Flexi – gratis umbuchbar",
+  "NDC / Dynamic Pricing",
+  "Ancillaries à la carte",
+  "Nur Hotel / Eigenanreise",
+];
+const rowGroups = [
+  {name:"Eigener Einkauf", span:1},
+  {name:"Dynamischer Einkauf (Bedbank)", span:2},
+  {name:"Direkt- & Spezialraten", span:2},
+  {name:"Alternative Unterkünfte", span:1},
+  {name:"Ohne Hotel", span:1},
+];
+const rows = [
+  "Kontingent – Pauschalrate (inkl. Verpflegung)",
+  "Bedbank – Non-refundable",
+  "Bedbank – Flex (kostenlos stornierbar)",
+  "Direktrate / BAR (Channel Manager)",
+  "Member-, Mobile- & Opaque-Raten",
+  "Ferienwohnung / Finca",
+  "Nur Flug",
+];
+// U = heute von uns adressiert, W = nur Wettbewerb, O = weißer Fleck, X = keine Kombination
+const status = [
+//  c1  c2  c3  c4  c5  c6  c7  c8  c9  c10 c11
+  ["U","W","U","W","W","W","U","W","W","W","U"], // Kontingent
+  ["U","W","U","W","W","W","U","W","W","W","W"], // Bedbank NR
+  ["W","W","W","W","W","W","W","W","W","W","W"], // Bedbank Flex
+  ["W","W","W","W","O","W","W","W","W","W","W"], // Direkt
+  ["O","W","W","O","O","W","W","O","W","W","W"], // Member/Opaque
+  ["O","O","W","O","O","W","W","O","O","O","W"], // FeWo
+  ["U","W","W","W","W","W","W","W","W","W","X"], // Nur Flug
+];
+// Initiativen: Zuordnung der Lücken (Priorität = Reihenfolge)
+const inits = [
+  {id:"A", wave:1, name:"Unbundled Fares & Ancillary-Shop", desc:"Light/Basic-Tarife ohne Koffer im Paket + Gepäck, Sitz, Priority à la carte",
+    cells:(r,c)=> [0,1].includes(r) && [1,5,9].includes(c)},
+  {id:"B", wave:1, name:"Flex-Baustein Flug + Hotel", desc:"Umbuchbare/erstattbare Fares und kostenlos stornierbare Hotelraten paketierbar",
+    cells:(r,c)=> (r<=2 && [3,4,7].includes(c)) || (r===2 && c<=9 && c!==8)},
+  {id:"C", wave:2, name:"NDC & Dynamic Pricing", desc:"NDC-Anbindung, Continuous Pricing, Airline-Bundles 1:1 im Angebot",
+    cells:(r,c)=> c===8 && r<=4},
+  {id:"D", wave:2, name:"Bausteine: Nur Flug & Nur Hotel", desc:"Alle Fares standalone (Nur Flug) + dynamische Nur-Hotel-Raten",
+    cells:(r,c)=> (r===6 && c<=9) || (c===10 && r>=1 && r<=4)},
+  {id:"E", wave:3, name:"Direkt- & Spezialraten", desc:"Direktanbindung Hotels/Channel Manager, Member-/Mobile-Raten (Paket-Opaque)",
+    cells:(r,c)=> r===3 || r===4},
+  {id:"F", wave:3, name:"Alternative Unterkünfte", desc:"FeWo/Fincas mit gängigen Fares paketieren",
+    cells:(r,c)=> r===5 && [2,5,6,10].includes(c)},
+];
+const target = status.map((row,r)=>row.map((s,c)=>{
+  if(s==="U"||s==="X") return {s};
+  for(const i of inits){ if(i.cells(r,c)) return {s:"I", i}; }
+  return {s: s==="W" ? "NP" : "O"};
+}));
+
+// ---------- View ----------
+const view = new URLSearchParams(location.search).get("view")==="target" ? "target" : "status";
+const total = status.flat().filter(s=>s!=="X").length;
+const usToday = status.flat().filter(s=>s==="U").length;
+const compOnly = status.flat().filter(s=>s==="W").length;
+const white = status.flat().filter(s=>s==="O").length;
+const pct = n => Math.round(n/total*100);
+
+document.getElementById("tracker").textContent = view==="status" ? "Gesamtmarkt & Status quo" : "Zielbild & Erweiterungspfad";
+document.getElementById("title").textContent = view==="status"
+  ? `Der Kunde wählt auf DE → PMI aus einem nahezu unbegrenzten Angebotsraum – unser TOM adressiert heute nur ~${pct(usToday)}% davon, den Großteil bespielt der Wettbewerb`
+  : `Sechs Produkterweiterungen in drei Wellen heben unsere Abdeckung des Gesamtmarkts von ~${pct(usToday)}% auf ~${pct(usToday+target.flat().filter(t=>t.s==="I").length)}% – Welle 1 schließt die größten Lücken`;
+document.getElementById("sub").textContent = view==="status"
+  ? "Gesamtmarkt = jede Kombination aus Flug (Carrier, Fare, Gepäck, Flexibilität, Pricing) und Hotel (Einkaufsquelle, Ratentyp, Storno-Bedingungen)"
+  : "Zuordnung der heutigen Lücken zu Produktinitiativen; bewusst nicht priorisierte Felder bleiben offen";
+document.querySelector(".yaxis span").innerHTML = "HOTELS &nbsp;→&nbsp; alle Quellen × Ratentypen × Storno-Bedingungen";
+
+const g = document.getElementById("grid");
+const add = (cls, html, style={}) => { const d=document.createElement("div"); d.className=cls; d.innerHTML=html||""; Object.assign(d.style,style); g.appendChild(d); return d; };
+// Kopfzeile Gruppen
+add("", "", {gridColumn:"1 / span 2"});
+let col=3; for(const cg of colGroups){ add("grp", cg.name, {gridColumn:`${col} / span ${cg.span}`}); col+=cg.span; }
+add("", "", {gridColumn:"1 / span 2"});
+cols.forEach(c=>add("ch", c));
+// Zeilen
+let gi=0, left=0;
+rows.forEach((rn,r)=>{
+  if(left===0){ const rg=rowGroups[gi++]; left=rg.span; add("rg", rg.name, {gridRow:`${r+3} / span ${rg.span}`}); }
+  left--;
+  add("rh", rn, {gridRow:`${r+3}`});
+  status[r].forEach((s,c)=>{
+    let cls=s, txt="";
+    if(view==="target"){ const t=target[r][c]; if(t.s==="I"){ cls="w"+t.i.wave; txt=t.i.id; } else cls=t.s; }
+    add("cell "+cls, txt, {gridRow:`${r+3}`, gridColumn:`${c+3}`});
+  });
+});
+
+// Rahmen "Gesamtmarkt"
+requestAnimationFrame(()=>{
+  const cells=[...g.querySelectorAll(".cell")]; const mw=document.getElementById("mw").getBoundingClientRect();
+  const a=cells[0].getBoundingClientRect(), b=cells[cells.length-1].getBoundingClientRect();
+  const f=document.createElement("div"); f.className="frame";
+  Object.assign(f.style,{left:(a.left-mw.left-7)+"px",top:(a.top-mw.top-7)+"px",width:(b.right-a.left+14)+"px",height:(b.bottom-a.top+14)+"px"});
+  document.getElementById("mw").appendChild(f);
+  const l=document.createElement("div"); l.className="frameLbl"; l.textContent="GESAMTMARKT DE → PMI";
+  Object.assign(l.style,{left:(b.right-mw.left-190)+"px",top:(b.bottom-mw.top-1)+"px"});
+  document.getElementById("mw").appendChild(l);
+});
+
+// Seitenleiste
+const side=document.getElementById("side");
+const sw = (bg, extra="") => `<span class="sw" style="background:${bg};${extra}"></span>`;
+if(view==="status"){
+  side.innerHTML = `
+    <div class="kpi"><div class="lbl">Abdeckung heute (Kombinationen)</div><div class="val">${pct(usToday)}% <small>${usToday} von ${total}</small></div></div>
+    <div class="kpi"><div class="lbl">Nur durch Wettbewerb adressiert</div><div class="val">${pct(compOnly)}% <small>${compOnly} Felder</small></div></div>
+    <div class="legend">
+      <div>${sw("var(--us)")} Heute von uns adressiert</div>
+      <div>${sw("var(--comp)")} Nur Wettbewerb (OTAs, Airline direkt, Booking-Plattformen)</div>
+      <div>${sw("#fff","border:1.5px dashed #98A2B3")} Weißer Fleck – kaum adressiert (${white})</div>
+      <div>${sw("repeating-linear-gradient(45deg,#fff 0 4px,#E4E7EC 4px 6px)")} Keine Kombination</div>
+    </div>
+    <div class="init"><div class="hd">Warum? – TOM-Restriktionen</div>
+      <div class="row" style="grid-template-columns:1fr"><span><b>Paket-Fares only:</b> Flug immer mit Freigepäck, kein Light/Basic</span></div>
+      <div class="row" style="grid-template-columns:1fr"><span><b>Starre Storno-Logik:</b> keine Flex-/Refundable-Fares & Hotelraten</span></div>
+      <div class="row" style="grid-template-columns:1fr"><span><b>Kein Ancillary-/NDC-Handling:</b> Airline-Bundles nicht abbildbar</span></div>
+      <div class="row" style="grid-template-columns:1fr"><span><b>Paket-Zwang:</b> Nur Flug / Nur Hotel nur aus Kontingent</span></div>
+    </div>`;
+} else {
+  const counts = inits.map(i=>({...i, n: target.flat().filter(t=>t.s==="I"&&t.i.id===i.id).length}));
+  const wc = {1:"var(--w1)",2:"var(--w2)",3:"var(--w3)"};
+  let cum = usToday;
+  const rowsHtml = counts.map(i=>{ cum+=i.n; return `<div class="row"><span class="badge" style="background:${wc[i.wave]};${i.wave===3?'color:var(--navy)':''}">${i.id}</span><span><b>${i.name}</b><br><span style="color:var(--mute)">${i.desc}</span></span><span class="pp">+${pct(i.n)}pp</span></div>`;}).join("");
+  const np = target.flat().filter(t=>t.s==="NP"||t.s==="O").length;
+  side.innerHTML = `
+    <div class="kpi"><div class="lbl">Abdeckung heute → Zielbild</div><div class="val">${pct(usToday)}% → ${pct(cum)}%</div></div>
+    <div class="legend" style="flex-direction:row;flex-wrap:wrap;gap:8px 14px">
+      <div>${sw("var(--us)")} Heute</div>
+      <div>${sw("var(--w1)")} Welle 1</div>
+      <div>${sw("var(--w2)")} Welle 2</div>
+      <div>${sw("var(--w3)")} Welle 3</div>
+      <div>${sw("var(--np)","border:1.5px dashed #98A2B3")} Bewusst nicht priorisiert (${np})</div>
+    </div>
+    <div class="init"><div class="hd">Produktinitiativen</div>${rowsHtml}</div>`;
+}
+</script>
+</body>
+</html>

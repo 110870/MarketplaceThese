@@ -2,7 +2,7 @@
 
 Zwei Folien im Beratungsstil:
 
-1. `slide_1_status_quo.png` – Gesamtmarkt als Matrix (X = Hotels, Y = Flüge), Ursprung unten links = Hauptinventar
+1. `slide_1_status_quo.png` – Gesamtmarkt als Matrix (X = Hotels, Y = Flüge: Private = Pooling, Linie, Linie/NDC; Public = Einzelplatz, Vfly, Broker/TO; jeweils Bag bzw. HBO), Ursprung unten links = Hauptinventar
    (Pooling/Private Gate × Top Choice). Zeigt: heute im Verkauf, Eigenpotenzial (nur wir), nur Wettbewerb, kein Zugriff
    (Exklusivware anderer Veranstalter).
 2. `slide_2_zielbild.png` – Vorläufige Bewertung: Rollout-Wellen 0–4 von unten links nach oben rechts, inkl. Marge und

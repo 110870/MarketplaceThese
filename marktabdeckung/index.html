@@ -144,14 +144,14 @@ const pct = n => Math.round(n/total*100);
 
 document.getElementById("tracker").textContent = view==="status" ? "Gesamtmarkt & Status quo" : "Bewertung & Rollout-Logik (vorläufig)";
 document.getElementById("title").textContent = view==="status"
-  ? `Der Kunde wählt auf DE → PMI aus einem riesigen Angebotsraum – wir verkaufen heute ~${pct(cnt("U"))}% davon; weitere ~${pct(cnt("P"))}% basieren auf eigenem bzw. privatem Inventar und können nur wir heben`
+  ? "Der Kunde wählt auf DE → PMI aus einem riesigen Angebotsraum – wir bedienen heute nur einen kleinen Ausschnitt; ein großer Teil basiert auf eigenem bzw. privatem Inventar und kann nur von uns gehoben werden"
   : "Wir expandieren von unten links nach oben rechts: erst das Hotelinventar mit allen Flugquellen monetarisieren, dann das Flugvolumen mit dynamischen Hotels absichern";
 document.getElementById("sub").textContent = view==="status"
   ? "Gesamtmarkt = jede Kombination aus Flugquelle/Fare-Option und Hotelquelle/Ratentyp; Ursprung unten links = unser Hauptinventar"
   : "Wellen nach Wertbeitrag: Marge sinkt, Verfügbarkeit steigt mit jedem weiteren Beschaffungsweg";
 document.getElementById("foot").innerHTML = view==="status"
-  ? "<span>Illustrativ – Zellen = Produktkombinationen, ungewichtet; Gewichtung nach Buchungsvolumen in Folgeschritt</span><span>TOM = heutiges Operating Model</span>"
-  : "<span>Illustrativ – Wellenzuordnung und Bewertung zur Entscheidung; ✓ = heute bereits im Verkauf</span><span>TOM = heutiges Operating Model</span>";
+  ? "<span>Schematische Darstellung – Zellen = Produktkombinationen Flug × Hotel</span><span>TOM = heutiges Operating Model</span>"
+  : "<span>Schematische Darstellung – Wellenzuordnung und Bewertung zur Entscheidung; ✓ = heute bereits im Verkauf</span><span>TOM = heutiges Operating Model</span>";
 
 const g=document.getElementById("grid");
 const add=(cls,html,style={})=>{const d=document.createElement("div");d.className=cls;d.innerHTML=html||"";Object.assign(d.style,style);g.appendChild(d);return d;};
@@ -202,11 +202,6 @@ const sw=(bg,extra="")=>`<span class="sw" style="background:${bg};${extra}"></sp
 const dots=n=>"●".repeat(n)+"<span style='color:#C9CED6'>"+"●".repeat(5-n)+"</span>";
 if(view==="status"){
   side.innerHTML=`
-    <div class="kpis">
-      <div class="kpi"><div class="lbl">Heute im Verkauf</div><div class="val">${pct(cnt("U"))}%</div></div>
-      <div class="kpi"><div class="lbl">Eigenpotenzial (nur wir)</div><div class="val" style="color:var(--w1)">${pct(cnt("P"))}%</div></div>
-      <div class="kpi"><div class="lbl">Nur Wettbewerb</div><div class="val" style="color:#8A94A3">${pct(cnt("W"))}%</div></div>
-    </div>
     <div class="legend">
       <div>${sw("var(--us)")} Heute von uns im Verkauf</div>
       <div>${sw("var(--own)","border:1.5px solid var(--w1)")} Eigenpotenzial: eigenes/privates Inventar, heute nicht verkauft</div>
